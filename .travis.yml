@@ -14,6 +14,7 @@ env:
   - TWILIO_ACCOUNT_SID=ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
   - TWILIO_AUTH_TOKEN=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
   - TWILIO_NUMBER=+15552737123
+  - AUTHY_API_KEY=your_api_key
 before_script:
   - psql -c 'create database account_verification;' -U postgres
   - php artisan migrate
