@@ -29,3 +29,19 @@ Route::post(
     '/user/create',
     ['uses' => 'UserController@createNewUser', 'as' => 'user-create', ]
 );
+
+Route::get(
+    '/user/verify', ['as' => 'user-show-verify', function() {
+        return response()->view('verifyUser');
+    }]
+);
+
+Route::post(
+    '/user/verify',
+    ['uses' => 'UserController@verify', 'as' => 'user-verify', ]
+);
+
+Route::post(
+    '/user/verify/resend',
+    ['uses' => 'UserController@verifyResend', 'as' => 'user-verify-resend', ]
+);

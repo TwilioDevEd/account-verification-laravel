@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     {!! csrf_field() !!}
-    <title>@yield('title') - Workflow Automation</title>
+    <title>@yield('title') - Account Verification</title>
 
     <!-- CSS -->
     <link rel="stylesheet"
@@ -12,9 +12,6 @@
           href="//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
     <link rel="stylesheet"
           href="//cdnjs.cloudflare.com/ajax/libs/authy-forms.css/2.2/form.authy.min.css">
-    <link rel="stylesheet" href="{{ asset('css/main.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/scaffolds.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/vacation_properties.css') }}">
     <link rel="stylesheet" href="{{ asset('css/application.css') }}">
 
     @yield('css')
