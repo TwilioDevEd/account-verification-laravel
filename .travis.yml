@@ -1,14 +1,19 @@
 language: php
 php:
-- 5.6
 - 5.5
+- 5.6
 install:
 - composer install
-scripts:
-  - mkdir -p build/logs
 env:
   global:
+  - DB_HOST=localhost
+  - DB_DATABASE=account_verification
+  - DB_USERNAME=postgres
   - APP_ENV=testing
-  - TWILIO_AUTH_TOKEN=token_here
-  - TWILIO_ACCOUNT_SID=sid_here
-  - TWILIO_NUMBER=number_here
+  - APP_KEY=rJhIZXkdo3FtwqdDJsC7Oad2HqhnarEE
+  - TWILIO_ACCOUNT_SID=ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+  - TWILIO_AUTH_TOKEN=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+  - TWILIO_NUMBER=+15552737123
+before_script:
+  - psql -c 'create database account_verification;' -U postgres
+  - php artisan migrate
