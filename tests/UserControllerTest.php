@@ -76,4 +76,57 @@ class UserControllerTest extends TestCase
             "User created successfully"
         );
     }
+
+    function testVerifyResend() {
+        // Given
+        $this->startSession();
+        $userData = [
+            'name' => 'Some name',
+            'email' => 'sname@enterprise.awesome',
+            'password' => 'strongpassword',
+            'country_code' => '1',
+            'phone_number' => '5558180101'
+        ];
+
+        $user = new User($userData);
+        $user->authy_id = 'authy_id';
+        $user->save();
+
+        $this->be($user);
+
+        $mockAuthyApi = Mockery::mock('Authy\AuthyApi')
+                            ->makePartial();
+        $mockSms = Mockery::mock();
+
+        $mockAuthyApi
+            ->shouldReceive('requestSms')
+            ->with('authy_id')
+            ->once()
+            ->andReturn($mockSms);
+        $mockSms
+            ->shouldReceive('ok')
+            ->once()
+            ->andReturn(true);
+
+        $this->app->instance(
+            'Authy\AuthyApi',
+            $mockAuthyApi
+        );
+
+        // When
+        $response = $this->call(
+            'POST',
+            route('user-verify-resend'),
+            ['_token' => csrf_token()]
+        );
+
+        // Then
+        $this->assertRedirectedToRoute('user-show-verify');
+        $this->assertSessionHas('status');
+        $flashMessage = $this->app['session']->get('status');
+        $this->assertEquals(
+            $flashMessage,
+            'Verification code re-sent'
+        );
+    }
 }

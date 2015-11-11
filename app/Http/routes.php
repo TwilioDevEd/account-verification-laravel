@@ -43,5 +43,7 @@ Route::post(
 
 Route::post(
     '/user/verify/resend',
-    ['uses' => 'UserController@verifyResend', 'as' => 'user-verify-resend', ]
+    ['uses' => 'UserController@verifyResend',
+     'middleware' => 'auth',
+     'as' => 'user-verify-resend']
 );
