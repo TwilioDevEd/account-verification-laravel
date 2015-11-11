@@ -52,23 +52,40 @@ class UserController extends Controller
             );
 
             $sms = $authyApi->requestSms($newUser->authy_id);
+            DB::commit();
+            return redirect()->route('user-show-verify');
         }
         else
         {
-            $errors = [];
-            foreach($authyUser->errors() as $field => $message) {
-                array_push($errors, $field . ': ' . $message);
-            }
+            $errors = $this->getAuthyErrors($authyUser->errors());
             DB::rollback();
             return view('newUser',['errors' => new MessageBag($errors)]);
         }
-        DB::commit();
-        return redirect()->route('user-show-verify');
     }
 
-    public function verify(Request $request, Authenticatable $user, AuthyApi $authyApi)
+    public function show(Authenticatable $user)
     {
-        return redirect()->route('user-show-verify');
+        return view('showUser', ['user' => $user]);
+    }
+
+    public function verify(Request $request, Authenticatable $user, AuthyApi $authyApi, TwilioRestClient $client)
+    {
+        $token = $request->input('token');
+        $verification = $authyApi->verifyToken($user->authy_id, $token);
+
+        if ($verification->ok())
+        {
+            $user->verified = true;
+            $user->save();
+            $this->sendSmsNotification($client, $user);
+
+            return redirect()->route('user-index');
+        }
+        else
+        {
+            $errors = $this->getAuthyErrors($verification->errors());
+            return view('verifyUser',['errors' => new MessageBag($errors)]);
+        }
     }
 
     public function verifyResend(Request $request, Authenticatable $user, AuthyApi $authyApi)
@@ -85,11 +102,29 @@ class UserController extends Controller
         }
         else
         {
-            $errors = [];
-            foreach($sms->errors() as $field => $message) {
-                array_push($errors, $field . ': ' . $message);
-            }
+            $errors = $this->getAuthyErrors($sms->errors());
             return view('verifyUser',['errors' => new MessageBag($errors)]);
         }
+    }
+
+    private function getAuthyErrors($authyErrors)
+    {
+        $errors = [];
+        foreach($authyErrors as $field => $message) {
+            array_push($errors, $field . ': ' . $message);
+        }
+        return $errors;
+    }
+
+    private function sendSmsNotification($client, $user)
+    {
+        $twilioNumber = config('services.twilio')['number'];
+        $messageBody = 'You did it! Signup complete :)';
+
+        $client->account->messages->sendMessage(
+            $twilioNumber, // From a Twilio number in your account
+            $user->fullNumber(), // Text any number
+            $messageBody
+        );
     }
 }

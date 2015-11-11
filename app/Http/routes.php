@@ -20,6 +20,13 @@ Route::get(
 
 // User related routes
 Route::get(
+    '/user',
+    ['as' => 'user-index',
+     'middleware' => 'auth',
+     'uses' => 'UserController@show']
+);
+
+Route::get(
     '/user/new', ['as' => 'user-new', function() {
         return response()->view('newUser');
     }]

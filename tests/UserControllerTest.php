@@ -129,4 +129,77 @@ class UserControllerTest extends TestCase
             'Verification code re-sent'
         );
     }
+
+    function testVerify() {
+        // Given
+        $this->startSession();
+        $userData = [
+            'name' => 'Some name',
+            'email' => 'sname@enterprise.awesome',
+            'password' => 'strongpassword',
+            'country_code' => '1',
+            'phone_number' => '5558180101'
+        ];
+
+        $user = new User($userData);
+        $user->authy_id = 'authy_id';
+        $user->save();
+
+        $this->be($user);
+
+        $mockAuthyApi = Mockery::mock('Authy\AuthyApi')
+                            ->makePartial();
+        $mockVerification = Mockery::mock();
+        $mockTwilioService = Mockery::mock('Services_Twilio')
+                                ->makePartial();
+        $mockTwilioAccount = Mockery::mock();
+        $mockTwilioMessages = Mockery::mock();
+        $mockTwilioAccount->messages = $mockTwilioMessages;
+        $mockTwilioService->account = $mockTwilioAccount;
+
+        $twilioNumber = config('services.twilio')['number'];
+        $mockTwilioMessages
+            ->shouldReceive('sendMessage')
+            ->with($twilioNumber,
+                   $user->fullNumber(),
+                   'You did it! Signup complete :)'
+            )
+            ->once();
+
+        $mockAuthyApi
+            ->shouldReceive('verifyToken')
+            ->with($user->authy_id,
+                   'authy_token')
+            ->once()
+            ->andReturn($mockVerification);
+        $mockVerification
+            ->shouldReceive('ok')
+            ->once()
+            ->andReturn(true);
+
+        $this->app->instance(
+            'Services_Twilio',
+            $mockTwilioService
+        );
+
+        $this->app->instance(
+            'Authy\AuthyApi',
+            $mockAuthyApi
+        );
+        $modifiedUser = User::first();
+        $this->assertFalse($modifiedUser->verified);
+
+        // When
+        $response = $this->call(
+            'POST',
+            route('user-verify'),
+            ['token' => 'authy_token',
+             '_token' => csrf_token()]
+        );
+
+        // Then
+        $modifiedUser = User::first();
+        $this->assertRedirectedToRoute('user-index');
+        $this->assertTrue($modifiedUser->verified);
+    }
 }
