@@ -1,0 +1,114 @@
+<!DOCTYPE html><html><head><title>Account Verification</title><style>body, html {
+  height:100%;
+  width:100%;
+  padding:0;
+  margin:0;
+  overflow:hidden;
+  background-color:#ddd;
+}
+.wrapper {
+  height:100%;
+  width:100%;
+}</style><link rel="shortcut icon" href="//twilio.com/bundles/marketing/img/favicons/favicon.ico"><link rel="apple-touch-icon" href="//twilio.com/bundles/marketing/img/favicons/favicon_57.png"><link rel="apple-touch-icon" sizes="72x72" href="//twilio.com/bundles/marketing/img/favicons/favicon_72.png"><link rel="apple-touch-icon" sizes="114x114" href="//twilio.com/bundles/marketing/img/favicons/favicon_114.png"><link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css"><link rel="stylesheet" href="viewsaurus.css"></head><body><div class="wrapper"><div id="viewsaurus" data-title="Account Verification"><div class="saurus-panes"><div class="saurus-prose"><div class="saurus-prose-header"><div class="title-outer"><span class="step-title">Account Verification</span></div></div><div class="saurus-nav-buttons"><div class="saurus-nav-button nav-overview"><div class="saurus-nav-button-inner"><i class="fa fa-fw fa-list"></i></div><div class="nav-divider"></div></div><div class="saurus-nav-button nav-previous"><div class="saurus-nav-button-inner"><a href=""> <i class="fa fa-fw fa-play fa-rotate-180"></i></a></div><div class="nav-divider"></div></div><div class="saurus-nav-button nav-next clickable"><div class="saurus-nav-button-inner"><a href="#1"> <i class="fa fa-fw fa-play"></i></a></div></div><div class="saurus-next-title"><span class="next-title-inner"></span></div></div><div class="saurus-progress-bar"></div><div class="saurus-start"><p>Learn to implement account verification in your web app with Twilio-powered Authy. Account verification helps you ensure your customer data is accurate and secure. This tutorial will show you the code to make it happen.</p><a href="#0">Start Tutorial</a></div><div class="saurus-content"><div data-title="Account Verification Laravel" class="chapter"><div data-title="Introduction" data-file="app/Http/routes.php" class="step"><h2 id="introduction">Introduction</h2>
+<p>Ready to implement user account verification in your application? Here&#39;s how it works at a high level:</p>
+<ol>
+<li><p>The user begins the registration process by entering their data, including a phone number, into a signup form</p>
+</li>
+<li><p>The authentication system sends a one-time password to the user&#39;s mobile phone to verify their possession of that phone number</p>
+</li>
+<li><p>The user enters the one-time password into a form before completing registeration</p>
+</li>
+<li><p>The user sees a success page and receives an SMS indicating that their account has been created</p>
+</li>
+</ol>
+<h2 id="building-blocks">Building Blocks</h2>
+<p>To get this done, you&#39;ll be working with the following Twilio-powered APIs:</p>
+<p><strong>Authy REST API</strong></p>
+<ul>
+<li><a href="//docs.authy.com/">Authy Docs</a>: Find quick starts, documentation, and all about the helper libraries.</li>
+</ul>
+<p><strong>Twilio REST API</strong></p>
+<ul>
+<li><a href="//www.twilio.com/docs/api/rest/sending-messages">Messages Resource</a>: We
+will use Twilio directly to send our user a confirmation message after they
+create an account</li>
+</ul>
+<p>Let&#39;s get started! Click the right arrow to move on to the next step of the tutorial.</p>
+</div><div data-title="User Model" data-file="database/migrations/2014_10_12_000000_create_users_table.php" data-highlight="15-26" class="step"><h2 id="the-user-model">The User Model</h2>
+<p>The User Model for this use-case is pretty straight-forward and Laravel
+offers us some tools to make it even simpler. If you have already read
+through the <a href="/docs/howto/walkthrough/two-factor-authentication">2FA tutorial</a>
+this probably looks very similar.</p>
+</div><div data-title="New User Form" data-file="app/Http/Controllers/UserController.php" data-highlight="23-64" class="step"><h2 id="new-user-form">New User Form</h2>
+<p>When we create a new user, we ask for a name, e-mail address, and a password.
+In order to validate their account, we also ask them for a mobile number
+with a country code, which we can use with Authy to send them one-time
+passwords via SMS.</p>
+<p>It is now the controller&#39;s responsibility to verify that the user provides
+the necessary information to create a new user, and in this case, if the
+user is created successfully, he/she will be logged in to the system automatically.</p>
+<p>So, now the user is logged in, but not verified. In the next steps, we&#39;ll
+learn how to verify the user using authy.</p>
+</div><div data-title="Configuring Authy" data-file="app/Providers/AuthyApiProvider.php" data-highlight="13-21" class="step"><h2 id="configuring-authy">Configuring Authy</h2>
+<p>In <code>.env.example</code>, we list configuration parameters for the application.
+These are pulled from system environment variables, which is a helpful way
+to access sensitive values (like API keys). This prevents us from accidentally
+checking them into source control. We also use Laravel configuration file
+to load the key and inject the <code>Authy\AuthyApi</code> into the application using a
+service provider.</p>
+<p>Now, we need our Authy production key (<a href="https://dashboard.authy.com/signup">sign up for Authy
+here</a>). When you create an Authy
+application, the production key is found on the dashboard:</p>
+<p><img src="//s3.amazonaws.com/howtodocs/2fa-authy-dashboard.png" alt="Authy Dashboard"></p>
+<p>Next, we need to jump over to the <code>UserController</code> to configure the Authy
+client and create an instance method to send a one-time password.</p>
+</div><div data-title="Sending a Token on Account Creation" data-file="app/Http/Controllers/UserController.php" data-highlight="23-64" class="step"><h2 id="sending-a-token-on-account-creation">Sending a Token on Account Creation</h2>
+<p>Once the user has an <code>authyId</code>, we can actually send a verification code
+to that user&#39;s mobile phone. </p>
+<p>When our user is created successfully via the form we implemented, we send
+a token to the user&#39;s mobile phone to verify their account in our
+controller. When the code is sent, we redirect to another page where the
+user can enter the token they were sent, completing the verification process.</p>
+<p>Let&#39;s check out the code for that next!</p>
+<hr>
+<p><strong>See Also:</strong></p>
+<ul>
+<li><a href="//github.com/authy/authy-php">PHP Client for Authy API</a></li>
+</ul>
+</div><div data-title="Verifying the Code" data-file="app/Http/Controllers/UserController.php" data-highlight="71-89" class="step"><h2 id="verifying-the-code">Verifying the Code</h2>
+<p>This controller function handles the form submission. It needs to:</p>
+<ul>
+<li>Get the current user </li>
+<li>Verify the code that was entered by the user</li>
+<li>If the code entered was valid, flip a boolean flag on the user model to
+indicate the account was verified</li>
+</ul>
+<h2 id="verifying-the-code">Verifying the Code</h2>
+<p>Authy provides us with a <code>verifyToken</code> method that allows us to pass a
+user id, and token. In this case we just
+need to check that the API request was successful and if so set
+<code>$user-&gt;verified</code> to true. </p>
+<p>That&#39;s all for token verification! However, our verification form wouldn&#39;t be very
+usable if there wasn&#39;t a way to resend a verification code if the message
+didn&#39;t arrive at the end user&#39;s handset for whatever reason.</p>
+<hr>
+<p><strong>See Also:</strong></p>
+<ul>
+<li><a href="//github.com/authy/authy-php">PHP Client for Authy API</a></li>
+</ul>
+</div><div data-title="Re-sending The Code" data-file="app/Http/Controllers/UserController.php" data-highlight="91-108" class="step"><h2 id="re-sending-the-code">Re-sending the Code</h2>
+<p>Since the form for re-sending the code is one line see the
+<a href="//github.com/TwilioDevEd/account-verification-laravel/blob/master/resources/views/verifyUser.blade.php">Verification form</a>.
+We&#39;re going to skip that for this tutorial. Let&#39;s just look at the controller function.</p>
+<p>This controller loads the <code>$User</code> associated with the request and then
+uses the same Authy API method we used earlier to resend the code.
+Pretty straightforward!</p>
+<p>To wrap things up, let&#39;s implement the last step where we confirm for the
+user that their account has been verified with a text message and a success page.</p>
+</div></div>
+<div class="saurus-files" style="display:none;"><textarea class="saurus-file" data-file="app/Http/routes.php" data-mode="php">PD9waHAKCi8qCnwtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQp8IEFwcGxpY2F0aW9uIFJvdXRlcwp8LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KfAp8IEhlcmUgaXMgd2hlcmUgeW91IGNhbiByZWdpc3RlciBhbGwgb2YgdGhlIHJvdXRlcyBmb3IgYW4gYXBwbGljYXRpb24uCnwgSXQncyBhIGJyZWV6ZS4gU2ltcGx5IHRlbGwgTGFyYXZlbCB0aGUgVVJJcyBpdCBzaG91bGQgcmVzcG9uZCB0bwp8IGFuZCBnaXZlIGl0IHRoZSBjb250cm9sbGVyIHRvIGNhbGwgd2hlbiB0aGF0IFVSSSBpcyByZXF1ZXN0ZWQuCnwKKi8KCi8vSG9tZSByZWxhdGVkIHJvdXRlcwpSb3V0ZTo6Z2V0KAogICAgJy8nLCBbJ2FzJyA9PiAnaG9tZScsIGZ1bmN0aW9uICgpIHsKICAgICAgICByZXR1cm4gcmVzcG9uc2UoKS0+dmlldygnaG9tZScpOwogICAgfV0KKTsKCi8vIFVzZXIgcmVsYXRlZCByb3V0ZXMKUm91dGU6OmdldCgKICAgICcvdXNlcicsCiAgICBbJ2FzJyA9PiAndXNlci1pbmRleCcsCiAgICAgJ21pZGRsZXdhcmUnID0+ICdhdXRoJywKICAgICAndXNlcycgPT4gJ1VzZXJDb250cm9sbGVyQHNob3cnXQopOwoKUm91dGU6OmdldCgKICAgICcvdXNlci9uZXcnLCBbJ2FzJyA9PiAndXNlci1uZXcnLCBmdW5jdGlvbigpIHsKICAgICAgICByZXR1cm4gcmVzcG9uc2UoKS0+dmlldygnbmV3VXNlcicpOwogICAgfV0KKTsKClJvdXRlOjpwb3N0KAogICAgJy91c2VyL2NyZWF0ZScsCiAgICBbJ3VzZXMnID0+ICdVc2VyQ29udHJvbGxlckBjcmVhdGVOZXdVc2VyJywgJ2FzJyA9PiAndXNlci1jcmVhdGUnLCBdCik7CgpSb3V0ZTo6Z2V0KAogICAgJy91c2VyL3ZlcmlmeScsIFsnYXMnID0+ICd1c2VyLXNob3ctdmVyaWZ5JywgZnVuY3Rpb24oKSB7CiAgICAgICAgcmV0dXJuIHJlc3BvbnNlKCktPnZpZXcoJ3ZlcmlmeVVzZXInKTsKICAgIH1dCik7CgpSb3V0ZTo6cG9zdCgKICAgICcvdXNlci92ZXJpZnknLAogICAgWyd1c2VzJyA9PiAnVXNlckNvbnRyb2xsZXJAdmVyaWZ5JywgJ2FzJyA9PiAndXNlci12ZXJpZnknLCBdCik7CgpSb3V0ZTo6cG9zdCgKICAgICcvdXNlci92ZXJpZnkvcmVzZW5kJywKICAgIFsndXNlcycgPT4gJ1VzZXJDb250cm9sbGVyQHZlcmlmeVJlc2VuZCcsCiAgICAgJ21pZGRsZXdhcmUnID0+ICdhdXRoJywKICAgICAnYXMnID0+ICd1c2VyLXZlcmlmeS1yZXNlbmQnXQopOwo=</textarea>
+<textarea class="saurus-file" data-file="database/migrations/2014_10_12_000000_create_users_table.php" data-mode="php">PD9waHAKCnVzZSBJbGx1bWluYXRlXERhdGFiYXNlXFNjaGVtYVxCbHVlcHJpbnQ7CnVzZSBJbGx1bWluYXRlXERhdGFiYXNlXE1pZ3JhdGlvbnNcTWlncmF0aW9uOwoKY2xhc3MgQ3JlYXRlVXNlcnNUYWJsZSBleHRlbmRzIE1pZ3JhdGlvbgp7CiAgICAvKioKICAgICAqIFJ1biB0aGUgbWlncmF0aW9ucy4KICAgICAqCiAgICAgKiBAcmV0dXJuIHZvaWQKICAgICAqLwogICAgcHVibGljIGZ1bmN0aW9uIHVwKCkKICAgIHsKICAgICAgICBTY2hlbWE6OmNyZWF0ZSgndXNlcnMnLCBmdW5jdGlvbiAoQmx1ZXByaW50ICR0YWJsZSkgewogICAgICAgICAgICAkdGFibGUtPmluY3JlbWVudHMoJ2lkJyk7CiAgICAgICAgICAgICR0YWJsZS0+c3RyaW5nKCduYW1lJyk7CiAgICAgICAgICAgICR0YWJsZS0+c3RyaW5nKCdlbWFpbCcpLT51bmlxdWUoKTsKICAgICAgICAgICAgJHRhYmxlLT5zdHJpbmcoJ3Bhc3N3b3JkJywgNjApOwogICAgICAgICAgICAkdGFibGUtPnN0cmluZygncGhvbmVfbnVtYmVyJyk7CiAgICAgICAgICAgICR0YWJsZS0+c3RyaW5nKCdjb3VudHJ5X2NvZGUnKTsKICAgICAgICAgICAgJHRhYmxlLT5zdHJpbmcoJ2F1dGh5X2lkJyktPm51bGxhYmxlKCk7CiAgICAgICAgICAgICR0YWJsZS0+Ym9vbGVhbigndmVyaWZpZWQnKS0+ZGVmYXVsdChmYWxzZSk7CiAgICAgICAgICAgICR0YWJsZS0+cmVtZW1iZXJUb2tlbigpOwogICAgICAgICAgICAkdGFibGUtPnRpbWVzdGFtcHMoKTsKICAgICAgICB9KTsKICAgIH0KCiAgICAvKioKICAgICAqIFJldmVyc2UgdGhlIG1pZ3JhdGlvbnMuCiAgICAgKgogICAgICogQHJldHVybiB2b2lkCiAgICAgKi8KICAgIHB1YmxpYyBmdW5jdGlvbiBkb3duKCkKICAgIHsKICAgICAgICBTY2hlbWE6OmRyb3AoJ3VzZXJzJyk7CiAgICB9Cn0K</textarea>
+<textarea class="saurus-file" data-file="app/Http/Controllers/UserController.php" data-mode="php">PD9waHAKbmFtZXNwYWNlIEFwcFxIdHRwXENvbnRyb2xsZXJzOwp1c2UgSWxsdW1pbmF0ZVxIdHRwXFJlcXVlc3Q7CnVzZSBBcHBcSHR0cFxSZXF1ZXN0czsKdXNlIEFwcFxIdHRwXENvbnRyb2xsZXJzXENvbnRyb2xsZXI7CnVzZSBJbGx1bWluYXRlXENvbnRyYWN0c1xBdXRoXEF1dGhlbnRpY2F0YWJsZTsKdXNlIEhhc2g7CnVzZSBBcHBcVXNlcjsKdXNlIEF1dGg7CnVzZSBEQjsKdXNlIElsbHVtaW5hdGVcU3VwcG9ydFxNZXNzYWdlQmFnOwp1c2UgU2VydmljZXNfVHdpbGlvIGFzIFR3aWxpb1Jlc3RDbGllbnQ7CnVzZSBBdXRoeVxBdXRoeUFwaSBhcyBBdXRoeUFwaTsKCmNsYXNzIFVzZXJDb250cm9sbGVyIGV4dGVuZHMgQ29udHJvbGxlcgp7CiAgICAvKioKICAgICAqIFN0b3JlIGEgbmV3IHVzZXIKICAgICAqCiAgICAgKiBAcGFyYW0gIFxJbGx1bWluYXRlXEh0dHBcUmVxdWVzdCAgJHJlcXVlc3QKICAgICAqIEByZXR1cm4gXElsbHVtaW5hdGVcSHR0cFxSZXNwb25zZQogICAgICovCiAgICBwdWJsaWMgZnVuY3Rpb24gY3JlYXRlTmV3VXNlcihSZXF1ZXN0ICRyZXF1ZXN0LCBBdXRoeUFwaSAkYXV0aHlBcGkpCiAgICB7CiAgICAgICAgJHRoaXMtPnZhbGlkYXRlKAogICAgICAgICAgICAkcmVxdWVzdCwgWwogICAgICAgICAgICAgICAgJ25hbWUnID0+ICdyZXF1aXJlZHxzdHJpbmcnLAogICAgICAgICAgICAgICAgJ2VtYWlsJyA9PiAncmVxdWlyZWR8dW5pcXVlOnVzZXJzfGVtYWlsJywKICAgICAgICAgICAgICAgICdwYXNzd29yZCcgPT4gJ3JlcXVpcmVkJywKICAgICAgICAgICAgICAgICdjb3VudHJ5X2NvZGUnID0+ICdyZXF1aXJlZCcsCiAgICAgICAgICAgICAgICAncGhvbmVfbnVtYmVyJyA9PiAncmVxdWlyZWR8bnVtZXJpYycKICAgICAgICAgICAgXQogICAgICAgICk7CgogICAgICAgICR2YWx1ZXMgPSAkcmVxdWVzdC0+YWxsKCk7CiAgICAgICAgJHZhbHVlc1sncGFzc3dvcmQnXSA9IEhhc2g6Om1ha2UoJHZhbHVlc1sncGFzc3dvcmQnXSk7CgogICAgICAgIERCOjpiZWdpblRyYW5zYWN0aW9uKCk7CgogICAgICAgICRuZXdVc2VyID0gbmV3IFVzZXIoJHZhbHVlcyk7CiAgICAgICAgJG5ld1VzZXItPnNhdmUoKTsKICAgICAgICBBdXRoOjpsb2dpbigkbmV3VXNlcik7CgogICAgICAgICRhdXRoeVVzZXIgPSAkYXV0aHlBcGktPnJlZ2lzdGVyVXNlcigkbmV3VXNlci0+ZW1haWwsICRuZXdVc2VyLT5waG9uZV9udW1iZXIsICRuZXdVc2VyLT5jb3VudHJ5X2NvZGUpOwogICAgICAgIGlmKCRhdXRoeVVzZXItPm9rKCkpCiAgICAgICAgewogICAgICAgICAgICAkbmV3VXNlci0+YXV0aHlfaWQgPSAkYXV0aHlVc2VyLT5pZCgpOwogICAgICAgICAgICAkbmV3VXNlci0+c2F2ZSgpOwogICAgICAgICAgICAkcmVxdWVzdC0+c2Vzc2lvbigpLT5mbGFzaCgKICAgICAgICAgICAgICAgICdzdGF0dXMnLAogICAgICAgICAgICAgICAgIlVzZXIgY3JlYXRlZCBzdWNjZXNzZnVsbHkiCiAgICAgICAgICAgICk7CgogICAgICAgICAgICAkc21zID0gJGF1dGh5QXBpLT5yZXF1ZXN0U21zKCRuZXdVc2VyLT5hdXRoeV9pZCk7CiAgICAgICAgICAgIERCOjpjb21taXQoKTsKICAgICAgICAgICAgcmV0dXJuIHJlZGlyZWN0KCktPnJvdXRlKCd1c2VyLXNob3ctdmVyaWZ5Jyk7CiAgICAgICAgfQogICAgICAgIGVsc2UKICAgICAgICB7CiAgICAgICAgICAgICRlcnJvcnMgPSAkdGhpcy0+Z2V0QXV0aHlFcnJvcnMoJGF1dGh5VXNlci0+ZXJyb3JzKCkpOwogICAgICAgICAgICBEQjo6cm9sbGJhY2soKTsKICAgICAgICAgICAgcmV0dXJuIHZpZXcoJ25ld1VzZXInLFsnZXJyb3JzJyA9PiBuZXcgTWVzc2FnZUJhZygkZXJyb3JzKV0pOwogICAgICAgIH0KICAgIH0KCiAgICBwdWJsaWMgZnVuY3Rpb24gc2hvdyhBdXRoZW50aWNhdGFibGUgJHVzZXIpCiAgICB7CiAgICAgICAgcmV0dXJuIHZpZXcoJ3Nob3dVc2VyJywgWyd1c2VyJyA9PiAkdXNlcl0pOwogICAgfQoKICAgIHB1YmxpYyBmdW5jdGlvbiB2ZXJpZnkoUmVxdWVzdCAkcmVxdWVzdCwgQXV0aGVudGljYXRhYmxlICR1c2VyLCBBdXRoeUFwaSAkYXV0aHlBcGksIFR3aWxpb1Jlc3RDbGllbnQgJGNsaWVudCkKICAgIHsKICAgICAgICAkdG9rZW4gPSAkcmVxdWVzdC0+aW5wdXQoJ3Rva2VuJyk7CiAgICAgICAgJHZlcmlmaWNhdGlvbiA9ICRhdXRoeUFwaS0+dmVyaWZ5VG9rZW4oJHVzZXItPmF1dGh5X2lkLCAkdG9rZW4pOwoKICAgICAgICBpZiAoJHZlcmlmaWNhdGlvbi0+b2soKSkKICAgICAgICB7CiAgICAgICAgICAgICR1c2VyLT52ZXJpZmllZCA9IHRydWU7CiAgICAgICAgICAgICR1c2VyLT5zYXZlKCk7CiAgICAgICAgICAgICR0aGlzLT5zZW5kU21zTm90aWZpY2F0aW9uKCRjbGllbnQsICR1c2VyKTsKCiAgICAgICAgICAgIHJldHVybiByZWRpcmVjdCgpLT5yb3V0ZSgndXNlci1pbmRleCcpOwogICAgICAgIH0KICAgICAgICBlbHNlCiAgICAgICAgewogICAgICAgICAgICAkZXJyb3JzID0gJHRoaXMtPmdldEF1dGh5RXJyb3JzKCR2ZXJpZmljYXRpb24tPmVycm9ycygpKTsKICAgICAgICAgICAgcmV0dXJuIHZpZXcoJ3ZlcmlmeVVzZXInLFsnZXJyb3JzJyA9PiBuZXcgTWVzc2FnZUJhZygkZXJyb3JzKV0pOwogICAgICAgIH0KICAgIH0KCiAgICBwdWJsaWMgZnVuY3Rpb24gdmVyaWZ5UmVzZW5kKFJlcXVlc3QgJHJlcXVlc3QsIEF1dGhlbnRpY2F0YWJsZSAkdXNlciwgQXV0aHlBcGkgJGF1dGh5QXBpKQogICAgewogICAgICAgICRzbXMgPSAkYXV0aHlBcGktPnJlcXVlc3RTbXMoJHVzZXItPmF1dGh5X2lkKTsKCiAgICAgICAgaWYgKCRzbXMtPm9rKCkpCiAgICAgICAgewogICAgICAgICAgICAkcmVxdWVzdC0+c2Vzc2lvbigpLT5mbGFzaCgKICAgICAgICAgICAgICAgICdzdGF0dXMnLAogICAgICAgICAgICAgICAgJ1ZlcmlmaWNhdGlvbiBjb2RlIHJlLXNlbnQnCiAgICAgICAgICAgICk7CiAgICAgICAgICAgIHJldHVybiByZWRpcmVjdCgpLT5yb3V0ZSgndXNlci1zaG93LXZlcmlmeScpOwogICAgICAgIH0KICAgICAgICBlbHNlCiAgICAgICAgewogICAgICAgICAgICAkZXJyb3JzID0gJHRoaXMtPmdldEF1dGh5RXJyb3JzKCRzbXMtPmVycm9ycygpKTsKICAgICAgICAgICAgcmV0dXJuIHZpZXcoJ3ZlcmlmeVVzZXInLFsnZXJyb3JzJyA9PiBuZXcgTWVzc2FnZUJhZygkZXJyb3JzKV0pOwogICAgICAgIH0KICAgIH0KCiAgICBwcml2YXRlIGZ1bmN0aW9uIGdldEF1dGh5RXJyb3JzKCRhdXRoeUVycm9ycykKICAgIHsKICAgICAgICAkZXJyb3JzID0gW107CiAgICAgICAgZm9yZWFjaCgkYXV0aHlFcnJvcnMgYXMgJGZpZWxkID0+ICRtZXNzYWdlKSB7CiAgICAgICAgICAgIGFycmF5X3B1c2goJGVycm9ycywgJGZpZWxkIC4gJzogJyAuICRtZXNzYWdlKTsKICAgICAgICB9CiAgICAgICAgcmV0dXJuICRlcnJvcnM7CiAgICB9CgogICAgcHJpdmF0ZSBmdW5jdGlvbiBzZW5kU21zTm90aWZpY2F0aW9uKCRjbGllbnQsICR1c2VyKQogICAgewogICAgICAgICR0d2lsaW9OdW1iZXIgPSBjb25maWcoJ3NlcnZpY2VzLnR3aWxpbycpWydudW1iZXInXTsKICAgICAgICAkbWVzc2FnZUJvZHkgPSAnWW91IGRpZCBpdCEgU2lnbnVwIGNvbXBsZXRlIDopJzsKCiAgICAgICAgJGNsaWVudC0+YWNjb3VudC0+bWVzc2FnZXMtPnNlbmRNZXNzYWdlKAogICAgICAgICAgICAkdHdpbGlvTnVtYmVyLCAvLyBGcm9tIGEgVHdpbGlvIG51bWJlciBpbiB5b3VyIGFjY291bnQKICAgICAgICAgICAgJHVzZXItPmZ1bGxOdW1iZXIoKSwgLy8gVGV4dCBhbnkgbnVtYmVyCiAgICAgICAgICAgICRtZXNzYWdlQm9keQogICAgICAgICk7CiAgICB9Cn0K</textarea>
+<textarea class="saurus-file" data-file="app/Providers/AuthyApiProvider.php" data-mode="php">PD9waHAKbmFtZXNwYWNlIEFwcFxQcm92aWRlcnM7CnVzZSBJbGx1bWluYXRlXFN1cHBvcnRcU2VydmljZVByb3ZpZGVyOwp1c2UgQXV0aHlcQXV0aHlBcGkgYXMgQXV0aHlBcGk7CgpjbGFzcyBBdXRoeUFwaVByb3ZpZGVyIGV4dGVuZHMgU2VydmljZVByb3ZpZGVyCnsKICAgIC8qKgogICAgICogUmVnaXN0ZXIgdGhlIGFwcGxpY2F0aW9uIHNlcnZpY2VzLgogICAgICoKICAgICAqIEByZXR1cm4gdm9pZAogICAgICovCiAgICBwdWJsaWMgZnVuY3Rpb24gcmVnaXN0ZXIoKQogICAgewogICAgICAgICR0aGlzLT5hcHAtPmJpbmQoCiAgICAgICAgICAgICdBdXRoeVxBdXRoeUFwaScsIGZ1bmN0aW9uICgkYXBwKSB7CiAgICAgICAgICAgICAgICAkYXV0aHlLZXkgPSBjb25maWcoJ3NlcnZpY2VzLmF1dGh5JylbJ2FwaUtleSddOwogICAgICAgICAgICAgICAgcmV0dXJuIG5ldyBBdXRoeUFwaSgkYXV0aHlLZXkpOwogICAgICAgICAgICB9CiAgICAgICAgKTsKICAgIH0KfQo=</textarea>
+</div>
+</div><div class="saurus-overview"><ul></ul></div></div><div class="saurus-code"><div class="file-path"><span class="crumb-container"></span><i class="fa fa-fw fa-folder"></i></div><div class="saurus-editor"></div></div><div class="saurus-explorer"><div class="saurus-file-list"></div><a href="https://github.com/TwilioDevEd/account-verification-laravel" target="_blank" class="explorer-get-code"> <i class="fa fa-lg fa-github-square"> </i>View Code on GitHub</a></div></div></div></div><script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script><script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script><script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"></script><script src="ace/ace.js"></script><script src="ace/theme-monokai.js"></script><script src="viewsaurus.js"></script></body></html>
