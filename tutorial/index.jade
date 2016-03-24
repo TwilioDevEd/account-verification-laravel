@@ -11,7 +11,7 @@
 
       1. The user enters the one-time password into a form before completing registration
 
-      1. The user sees a success page and receives an SMS indicating that his/her account has been created
+      1. The user opens a success page and receives an SMS indicating that his/her account has been created
 
       ## Building Blocks
 
@@ -22,12 +22,13 @@
       * [Authy Docs](//docs.authy.com/): Find quick starts, documentation, and all about the helper libraries.
 
       **Twilio REST API**
+
       * [Messages Resource](//www.twilio.com/docs/api/rest/sending-messages): We
       will use Twilio directly to send our user a confirmation message after they
-      create an account
+      create an account.
 
       Let's get started! Click the right arrow to move on to the next step of the tutorial.
-      
+
   .step(data-title='User Model', data-file='database/migrations/2014_10_12_000000_create_users_table.php',
     data-highlight='15-26')
     :markdown
@@ -36,71 +37,71 @@
       The User Model for this use-case is pretty straight-forward and Laravel
       offers us some tools to make it even simpler. If you have already read
       through the [2FA tutorial](//www.twilio.com/docs/tutorials/walkthrough/two-factor-authentication/php/laravel)
-      this probably looks very similar.
+      this one probably looks very similar.
 
   .step(data-title='New User Form', data-file='app/Http/Controllers/UserController.php', data-highlight='23-64')
     :markdown
       ## New User Form
 
       When we create a new user, we ask for a name, e-mail address, and a password.
-      In order to validate their account, we also ask them for a mobile number
-      with a country code, which we can use with Authy to send them one-time
-      passwords via SMS.
+      In order to validate their account we also ask them for a mobile number
+      with a country code. We use Authy to send them a one-time password via SMS
+      to this phone number.
 
       It is now the controller's responsibility to verify that the user provides
-      the necessary information to create a new user, and in this case, if the
-      user is created successfully, he/she will be logged in to the system automatically.
-      
-      So, now the user is logged in, but not verified. In the next steps, we'll
+      the necessary information to create a new user. If the user is created successfully,
+      he/she will be logged into the system automatically.
+
+      Now the user is logged in but not verified. In the next steps we'll
       learn how to verify the user using authy.
-      
+
   .step(data-title="Configuring Authy", data-file="app/Providers/AuthyApiProvider.php",
     data-highlight="13-21")
     :markdown
       ## Configuring Authy
 
-      In `.env.example`, we list configuration parameters for the application.
+      In `.env.example` we list configuration parameters for the application.
       These are pulled from system environment variables, which is a helpful way
       to access sensitive values (like API keys). This prevents us from accidentally
       checking them into source control. We also use Laravel configuration file
       to load the key and inject the `Authy\AuthyApi` into the application using a
       service provider.
 
-      Now, we need our Authy production key ([sign up for Authy
+      Now we need our Authy production key ([sign up for Authy
       here](https://dashboard.authy.com/signup)). When you create an Authy
-      application, the production key is found on the dashboard:
+      application the production key is found on the dashboard.
 
       ![Authy Dashboard](//s3.amazonaws.com/howtodocs/2fa-authy-dashboard.png)
 
-      Next, we need to jump over to the `UserController` to configure the Authy
+      Next we need to jump over to the `UserController` to configure the Authy
       client and create an instance method to send a one-time password.
 
   .step(data-title='Sending a Token on Account Creation', data-file='app/Http/Controllers/UserController.php', data-highlight='23-64')
     :markdown
       ## Sending a Token on Account Creation
 
-      Once the user has an `authyId`, we can actually send a verification code
-      to that user's mobile phone. 
+      Once the user has an `authyId` we can actually send a verification code
+      to that user's mobile phone.
 
-      When our user is created successfully via the form we implemented, we send
+      When our user is created successfully, via the form we implemented, we send
       a token to the user's mobile phone to verify their account in our
-      controller. When the code is sent, we redirect to another page where the
-      user can enter the token they received, completing the verification process.
+      controller. When the code is sent we redirect to another page where the
+      user can enter the token they received, therefore completing the verification process.
 
       Let's check out the code for that next!
-      
+
       ---
 
       **See Also:**
       * [PHP Client for Authy API](//github.com/authy/authy-php)
-      
+
   .step(data-title='Verifying the Code', data-file='app/Http/Controllers/UserController.php', data-highlight='71-89')
     :markdown
       ## Verifying the Code
 
-      This controller function handles the form submission. It needs to:
+      This controller function handles the submission form. It needs to:
 
-      * Get the current user 
+      * Get the current user
       * Verify the code that was entered by the user
       * If the code entered was valid, flip a boolean flag on the user model to
         indicate the account was verified
@@ -108,13 +109,12 @@
       ## Verifying the Code
 
       Authy provides us with a `verifyToken()` method that allows us to pass a
-      user id, and token. In this case we just
-      need to check that the API request was successful and if so set
-      `$user->verified` to true. 
+      user id and a token. In this case we just need to check that the API request
+      was successful and if so, set `$user->verified` to true.
 
       That's all for token verification! However, our verification form wouldn't be very
       usable if there wasn't a way to resend a verification code if the message
-      didn't arrive at the end user's handset for whatever reason.
+      didn't arrive at the end user's handset.
 
       ---
 
@@ -131,11 +131,10 @@
 
       This controller loads the `$User` associated with the request and then
       uses the same Authy API method we used earlier to resend the code.
-      Pretty straightforward!
 
-      To wrap things up, let's implement the last step where we confirm for the
-      user that their account has been verified with a text message and a success page.
-      
+      To wrap things up, let's implement the last step where we confirm that the
+      user's account has been verified with a text message and a success page.
+
   .step(data-title="Show User Details Page", data-file="resources/views/showUser.blade.php")
     :markdown
       ## Show User Details Page
@@ -145,34 +144,36 @@
 
       This should suffice for confirmation in the browser that the user has been
       verified. Let's see how we might send that text message next.
-      
+
   .step(data-title='Sending the Confirmation Message', data-file='app/Http/Controllers/UserController.php', data-highlight='119-129')
     :markdown
       ## Sending the Confirmation Message
 
-      Much as we did for our Authy client, we create a single instance of the
-      Twilio REST API helper, called `$client` in this example.
+      We create a single instance of the Twilio REST API helper,
+      called `$client` in this example.
 
       Then all we need to do to send an sms to the user's phone is use the built
       in `sendMessage()`. Notice that we are using the user's
       `fullNumber()` to make sure we support international numbers. The `fullNumber()`
       method in the `User` model simply returns a combination of the `country_code`
       and `phone_number` that the user provided upon registration.
-      
+
       For more information on how to send SMS using Twilio's Rest API visit this
       [link](//twilio-php.readthedocs.org/en/latest/usage/rest/messages.html#sending-a-message).
-      
+
       ---
 
       **See Also:**
       * [Twilio Rest API Documentation](https://www.twilio.com/docs/api/rest)
       * [Sending SMS With the API](//www.twilio.com/docs/api/rest/sending-messages)
-      
+
   .step(data-title='Where to Next?')
     :markdown
       ## Where to Next?
 
-      That's it! We've just implemented account verification so your users can
+      That's it!
+
+      We've just implemented account verification so your users can
       confirm their phone number. If you're a PHP developer working with Twilio,
       you might want to check out these other tutorials:
 
