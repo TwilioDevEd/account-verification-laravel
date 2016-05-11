@@ -48,7 +48,7 @@ to this phone number.</p>
 the necessary information to create a new user. If the user is created successfully,
 he/she will be logged into the system automatically.</p>
 <p>Now the user is logged in but not verified. In the next steps we&#39;ll
-learn how to verify the user using authy.</p>
+learn how to verify the user using Authy.</p>
 </div><div data-title="Configuring Authy" data-file="app/Providers/AuthyApiProvider.php" data-highlight="13-21" class="step"><h2 id="configuring-authy">Configuring Authy</h2>
 <p>In <code>.env.example</code> we list configuration parameters for the application.
 These are pulled from system environment variables, which is a helpful way
@@ -111,7 +111,7 @@ verified. Let&#39;s see how we might send that text message next.</p>
 </div><div data-title="Sending the Confirmation Message" data-file="app/Http/Controllers/UserController.php" data-highlight="119-129" class="step"><h2 id="sending-the-confirmation-message">Sending the Confirmation Message</h2>
 <p>We create a single instance of the Twilio REST API helper,
 called <code>$client</code> in this example.</p>
-<p>Then all we need to do to send an sms to the user&#39;s phone is use the built
+<p>Then all we need to do to send an SMS to the user&#39;s phone is use the built
 in <code>sendMessage()</code>. Notice that we are using the user&#39;s
 <code>fullNumber()</code> to make sure we support international numbers. The <code>fullNumber()</code>
 method in the <code>User</code> model simply returns a combination of the <code>country_code</code>

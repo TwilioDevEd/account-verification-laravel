@@ -53,7 +53,7 @@
       he/she will be logged into the system automatically.
 
       Now the user is logged in but not verified. In the next steps we'll
-      learn how to verify the user using authy.
+      learn how to verify the user using Authy.
 
   .step(data-title="Configuring Authy", data-file="app/Providers/AuthyApiProvider.php",
     data-highlight="13-21")
@@ -152,7 +152,7 @@
       We create a single instance of the Twilio REST API helper,
       called `$client` in this example.
 
-      Then all we need to do to send an sms to the user's phone is use the built
+      Then all we need to do to send an SMS to the user's phone is use the built
       in `sendMessage()`. Notice that we are using the user's
       `fullNumber()` to make sure we support international numbers. The `fullNumber()`
       method in the `User` model simply returns a combination of the `country_code`
