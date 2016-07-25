@@ -3,15 +3,20 @@
     :markdown
       ## Introduction
 
-      Ready to implement user account verification in your application? Here's how it works at a high level:
+      Ready to implement user account verification in your application? Here's how it
+       works at a high level:
 
-      1. The users begin the registration process by entering their data, including a phone number, into a signup form
+      1. The users begin the registration process by entering their data, including a
+       phone number, into a signup form
 
-      1. The authentication system sends a one-time password to the user's mobile phone to verify the possession of that phone number
+      1. The authentication system sends a one-time password to the user's mobile
+      phone to verify the possession of that phone number
 
-      1. The user enters the one-time password into a form before completing registration
+      1. The user enters the one-time password into a form before completing
+      registration
 
-      1. The user opens a success page and receives an SMS indicating that his/her account has been created
+      1. The user opens a success page and receives an SMS indicating that his/her
+      account has been created
 
       ## Building Blocks
 
@@ -19,7 +24,8 @@
 
       **Authy REST API**
 
-      * [Authy Docs](//docs.authy.com/): Find quick starts, documentation, and all about the helper libraries.
+      * [Authy Docs](//docs.authy.com/): Find quick starts, documentation, and all
+      about the helper libraries.
 
       **Twilio REST API**
 
@@ -27,7 +33,8 @@
       will use Twilio directly to send our user a confirmation message after they
       create an account.
 
-      Let's get started! Click the right arrow to move on to the next step of the tutorial.
+      Let's get started! Click the right arrow to move on to the next step of the
+      tutorial.
 
   .step(data-title='User Model', data-file='database/migrations/2014_10_12_000000_create_users_table.php',
     data-highlight='15-26')
@@ -39,7 +46,9 @@
       through the [2FA tutorial](//www.twilio.com/docs/tutorials/walkthrough/two-factor-authentication/php/laravel)
       this one probably looks very similar.
 
-  .step(data-title='New User Form', data-file='app/Http/Controllers/UserController.php', data-highlight='23-64')
+  .step(data-title='New User Form',
+        data-file='app/Http/Controllers/UserController.php',
+        data-highlight='18-66')
     :markdown
       ## New User Form
 
@@ -55,8 +64,9 @@
       Now the user is logged in but not verified. In the next steps we'll
       learn how to verify the user using Authy.
 
-  .step(data-title="Configuring Authy", data-file="app/Providers/AuthyApiProvider.php",
-    data-highlight="13-21")
+  .step(data-title="Configuring Authy",
+        data-file="app/Providers/AuthyApiProvider.php",
+        data-highlight="7-25")
     :markdown
       ## Configuring Authy
 
@@ -76,11 +86,13 @@
       Next we need to jump over to the `UserController` to configure the Authy
       client and create an instance method to send a one-time password.
 
-  .step(data-title='Sending a Token on Account Creation', data-file='app/Http/Controllers/UserController.php', data-highlight='23-64')
+  .step(data-title='Sending a Token on Account Creation',
+        data-file='app/Http/Controllers/UserController.php',
+        data-highlight='58,60')
     :markdown
       ## Sending a Token on Account Creation
 
-      Once the user has an `authyId` we can actually send a verification code
+      Once the user has an `authy_id` we can actually send a verification code
       to that user's mobile phone.
 
       When our user is created successfully, via the form we implemented, we send
@@ -95,7 +107,9 @@
       **See Also:**
       * [PHP Client for Authy API](//github.com/authy/authy-php)
 
-  .step(data-title='Verifying the Code', data-file='app/Http/Controllers/UserController.php', data-highlight='71-89')
+  .step(data-title='Verifying the Code',
+        data-file='app/Http/Controllers/UserController.php',
+        data-highlight='79-103')
     :markdown
       ## Verifying the Code
 
@@ -121,7 +135,9 @@
       **See Also:**
       * [PHP Client for Authy API](//github.com/authy/authy-php)
 
-  .step(data-title='Re-sending The Code', data-file='app/Http/Controllers/UserController.php', data-highlight='91-108')
+  .step(data-title='Re-sending The Code',
+        data-file='app/Http/Controllers/UserController.php',
+        data-highlight='105-128')
     :markdown
       ## Re-sending the Code
 
@@ -129,7 +145,7 @@
       [Verification form](//github.com/TwilioDevEd/account-verification-laravel/blob/master/resources/views/verifyUser.blade.php).
       We're going to skip that for this tutorial. Let's just look at the controller function.
 
-      This controller loads the `$User` associated with the request and then
+      This controller loads the `$user` associated with the request and then
       uses the same Authy API method we used earlier to resend the code.
 
       To wrap things up, let's implement the last step where we confirm that the
@@ -145,15 +161,17 @@
       This should suffice for confirmation in the browser that the user has been
       verified. Let's see how we might send that text message next.
 
-  .step(data-title='Sending the Confirmation Message', data-file='app/Http/Controllers/UserController.php', data-highlight='119-129')
+  .step(data-title='Sending the Confirmation Message',
+        data-file='app/Http/Controllers/UserController.php',
+        data-highlight='139-153')
     :markdown
       ## Sending the Confirmation Message
 
       We create a single instance of the Twilio REST API helper,
       called `$client` in this example.
 
-      Then all we need to do to send an SMS to the user's phone is use the built
-      in `sendMessage()`. Notice that we are using the user's
+      Then all we need to do to send an SMS to the user's phone is use
+      `messages->create`. Notice that we are using the user's
       `fullNumber()` to make sure we support international numbers. The `fullNumber()`
       method in the `User` model simply returns a combination of the `country_code`
       and `phone_number` that the user provided upon registration.
