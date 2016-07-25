@@ -7,8 +7,8 @@
     "require": {
         "php": ">=5.5.9",
         "laravel/framework": "5.1.*",
-        "twilio/sdk": "~4.5",
-        "authy/php": "2.*",
+        "twilio/sdk": "5.0.0-RC8",
+        "authy/php": "~2.4",
         "laravelcollective/html": "5.1.*"
     },
     "require-dev": {
