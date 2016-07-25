@@ -1,7 +1,8 @@
 <?php
 namespace App\Providers;
-use Illuminate\Support\ServiceProvider;
+
 use Authy\AuthyApi as AuthyApi;
+use Illuminate\Support\ServiceProvider;
 
 class AuthyApiProvider extends ServiceProvider
 {
@@ -12,11 +13,13 @@ class AuthyApiProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind(
-            'Authy\AuthyApi', function ($app) {
-                $authyKey = config('services.authy')['apiKey'];
-                return new AuthyApi($authyKey);
-            }
-        );
+        $this->app->singleton(AuthyApi::class, function ($app) {
+            $authyKey = getenv('AUTHY_API_KEY') or die(
+                "You must specify your api key for Authy. " .
+                "Visit https://dashboard.authy.com/"
+            );
+            
+            return new AuthyApi($authyKey);
+        });
     }
 }
