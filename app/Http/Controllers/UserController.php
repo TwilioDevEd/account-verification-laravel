@@ -10,7 +10,6 @@ use Hash;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\MessageBag;
-use Services_Twilio as TwilioRestClient;
 use Twilio\Rest\Client;
 
 class UserController extends Controller
@@ -139,14 +138,14 @@ class UserController extends Controller
     private function sendSmsNotification($client, $user)
     {
         $twilioNumber = config('services.twilio')['number'] or die(
-        "TWILIO_NUMBER is not set in the environment"
+            "TWILIO_NUMBER is not set in the environment"
         );
         $messageBody = 'You did it! Signup complete :)';
 
         $client->messages->create(
             $user->fullNumber(),    // Phone number which receives the message
-            $twilioNumber,          // From a Twilio number in your account
             [
+                "from" => $twilioNumber, // From a Twilio number in your account
                 "body" => $messageBody
             ]
         );
