@@ -162,8 +162,10 @@ class UserControllerTest extends TestCase
             ->shouldReceive('create')
             ->with(
                 $user->fullNumber(),
-                $twilioNumber,
-                ["body" => 'You did it! Signup complete :)']
+                [
+                    'body' => 'You did it! Signup complete :)',
+                    'from' => $twilioNumber
+                ]
             )
             ->once();
 
