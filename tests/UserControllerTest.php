@@ -1,14 +1,13 @@
 <?php
-use Illuminate\Foundation\Testing\WithoutMiddleware;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use App\User;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class UserControllerTest extends TestCase
 {
     use DatabaseTransactions;
 
-    function testNewUser() {
+    function testNewUser()
+    {
         // Given
         $this->startSession();
         $validName = 'Some name';
@@ -19,14 +18,14 @@ class UserControllerTest extends TestCase
         $this->assertCount(0, User::all());
 
         $mockAuthyApi = Mockery::mock('Authy\AuthyApi')
-                            ->makePartial();
+            ->makePartial();
         $mockAuthyUser = Mockery::mock();
 
         $mockAuthyApi
             ->shouldReceive('registerUser')
             ->with($validEmail,
-                   $validPhoneNumber,
-                   $validCountryCode
+                $validPhoneNumber,
+                $validCountryCode
             )
             ->once()
             ->andReturn($mockAuthyUser);
@@ -52,12 +51,14 @@ class UserControllerTest extends TestCase
         $response = $this->call(
             'POST',
             route('user-create'),
-            ['name' => $validName,
-             'email' => $validEmail,
-             'password' => $validPassword,
-             'country_code' => $validCountryCode,
-             'phone_number' => $validPhoneNumber,
-             '_token' => csrf_token()]
+            [
+                'name' => $validName,
+                'email' => $validEmail,
+                'password' => $validPassword,
+                'country_code' => $validCountryCode,
+                'phone_number' => $validPhoneNumber,
+                '_token' => csrf_token()
+            ]
         );
 
         // Then
@@ -77,7 +78,8 @@ class UserControllerTest extends TestCase
         );
     }
 
-    function testVerifyResend() {
+    function testVerifyResend()
+    {
         // Given
         $this->startSession();
         $userData = [
@@ -95,7 +97,7 @@ class UserControllerTest extends TestCase
         $this->be($user);
 
         $mockAuthyApi = Mockery::mock('Authy\AuthyApi')
-                            ->makePartial();
+            ->makePartial();
         $mockSms = Mockery::mock();
 
         $mockAuthyApi
@@ -130,7 +132,8 @@ class UserControllerTest extends TestCase
         );
     }
 
-    function testVerify() {
+    function testVerify()
+    {
         // Given
         $this->startSession();
         $userData = [
@@ -148,28 +151,28 @@ class UserControllerTest extends TestCase
         $this->be($user);
 
         $mockAuthyApi = Mockery::mock('Authy\AuthyApi')
-                            ->makePartial();
+            ->makePartial();
         $mockVerification = Mockery::mock();
-        $mockTwilioService = Mockery::mock('Services_Twilio')
-                                ->makePartial();
-        $mockTwilioAccount = Mockery::mock();
-        $mockTwilioMessages = Mockery::mock();
-        $mockTwilioAccount->messages = $mockTwilioMessages;
-        $mockTwilioService->account = $mockTwilioAccount;
+        $mockTwilioClient = Mockery::mock(\Twilio\Rest\Client::class)
+            ->makePartial();
+        $mockTwilioClient->messages = Mockery::mock();
 
         $twilioNumber = config('services.twilio')['number'];
-        $mockTwilioMessages
-            ->shouldReceive('sendMessage')
-            ->with($twilioNumber,
-                   $user->fullNumber(),
-                   'You did it! Signup complete :)'
+        $mockTwilioClient->messages
+            ->shouldReceive('create')
+            ->with(
+                $user->fullNumber(),
+                [
+                    'body' => 'You did it! Signup complete :)',
+                    'from' => $twilioNumber
+                ]
             )
             ->once();
 
         $mockAuthyApi
             ->shouldReceive('verifyToken')
             ->with($user->authy_id,
-                   'authy_token')
+                'authy_token')
             ->once()
             ->andReturn($mockVerification);
         $mockVerification
@@ -178,8 +181,8 @@ class UserControllerTest extends TestCase
             ->andReturn(true);
 
         $this->app->instance(
-            'Services_Twilio',
-            $mockTwilioService
+            \Twilio\Rest\Client::class,
+            $mockTwilioClient
         );
 
         $this->app->instance(
@@ -193,8 +196,10 @@ class UserControllerTest extends TestCase
         $response = $this->call(
             'POST',
             route('user-verify'),
-            ['token' => 'authy_token',
-             '_token' => csrf_token()]
+            [
+                'token' => 'authy_token',
+                '_token' => csrf_token()
+            ]
         );
 
         // Then
