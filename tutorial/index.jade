@@ -4,19 +4,19 @@
       ## Introduction
 
       Ready to implement user account verification in your application? Here's how it
-       works at a high level:
+      works at a high level:
 
       1. The users begin the registration process by entering their data, including a
-       phone number, into a signup form
+         phone number, into a signup form
 
       1. The authentication system sends a one-time password to the user's mobile
-      phone to verify the possession of that phone number
+         phone to verify the possession of that phone number
 
       1. The user enters the one-time password into a form before completing
-      registration
+         registration
 
       1. The user opens a success page and receives an SMS indicating that his/her
-      account has been created
+         account has been created
 
       ## Building Blocks
 
@@ -48,7 +48,7 @@
 
   .step(data-title='New User Form',
         data-file='app/Http/Controllers/UserController.php',
-        data-highlight='18-66')
+        data-highlight='23-65')
     :markdown
       ## New User Form
 
@@ -88,7 +88,7 @@
 
   .step(data-title='Sending a Token on Account Creation',
         data-file='app/Http/Controllers/UserController.php',
-        data-highlight='58,60')
+        data-highlight='49-60')
     :markdown
       ## Sending a Token on Account Creation
 
@@ -137,7 +137,7 @@
 
   .step(data-title='Re-sending The Code',
         data-file='app/Http/Controllers/UserController.php',
-        data-highlight='105-128')
+        data-highlight='112-127')
     :markdown
       ## Re-sending the Code
 
@@ -163,7 +163,7 @@
 
   .step(data-title='Sending the Confirmation Message',
         data-file='app/Http/Controllers/UserController.php',
-        data-highlight='139-153')
+        data-highlight='138-153')
     :markdown
       ## Sending the Confirmation Message
 
@@ -171,7 +171,7 @@
       called `$client` in this example.
 
       Then all we need to do to send an SMS to the user's phone is use
-      `messages->create`. Notice that we are using the user's
+      `messages->create()` method. Notice that we are using the user's
       `fullNumber()` to make sure we support international numbers. The `fullNumber()`
       method in the `User` model simply returns a combination of the `country_code`
       and `phone_number` that the user provided upon registration.
