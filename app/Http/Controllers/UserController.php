@@ -1,23 +1,23 @@
 <?php
 namespace App\Http\Controllers;
-use Illuminate\Http\Request;
+
 use App\Http\Requests;
-use App\Http\Controllers\Controller;
-use Illuminate\Contracts\Auth\Authenticatable;
-use Hash;
 use App\User;
 use Auth;
-use DB;
-use Illuminate\Support\MessageBag;
-use Services_Twilio as TwilioRestClient;
 use Authy\AuthyApi as AuthyApi;
+use DB;
+use Hash;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Http\Request;
+use Illuminate\Support\MessageBag;
+use Twilio\Rest\Client;
 
 class UserController extends Controller
 {
     /**
      * Store a new user
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function createNewUser(Request $request, AuthyApi $authyApi)
@@ -41,9 +41,12 @@ class UserController extends Controller
         $newUser->save();
         Auth::login($newUser);
 
-        $authyUser = $authyApi->registerUser($newUser->email, $newUser->phone_number, $newUser->country_code);
-        if($authyUser->ok())
-        {
+        $authyUser = $authyApi->registerUser(
+            $newUser->email,
+            $newUser->phone_number,
+            $newUser->country_code
+        );
+        if ($authyUser->ok()) {
             $newUser->authy_id = $authyUser->id();
             $newUser->save();
             $request->session()->flash(
@@ -54,63 +57,79 @@ class UserController extends Controller
             $sms = $authyApi->requestSms($newUser->authy_id);
             DB::commit();
             return redirect()->route('user-show-verify');
-        }
-        else
-        {
+        } else {
             $errors = $this->getAuthyErrors($authyUser->errors());
             DB::rollback();
-            return view('newUser',['errors' => new MessageBag($errors)]);
+            return view('newUser', ['errors' => new MessageBag($errors)]);
         }
     }
 
+    /**
+     * This controller function shows the current user status
+     *
+     * @param Authenticatable $user Current user
+     * @return mixed Response view
+     */
     public function show(Authenticatable $user)
     {
         return view('showUser', ['user' => $user]);
     }
 
-    public function verify(Request $request, Authenticatable $user, AuthyApi $authyApi, TwilioRestClient $client)
+    /**
+     * This controller function handles the submission form
+     *
+     * @param Request $request Current User Request
+     * @param Authenticatable $user Current User
+     * @param AuthyApi $authyApi Authy Client
+     * @return mixed Response view
+     */
+    public function verify(Request $request, Authenticatable $user,
+                           AuthyApi $authyApi, Client $client)
     {
         $token = $request->input('token');
         $verification = $authyApi->verifyToken($user->authy_id, $token);
 
-        if ($verification->ok())
-        {
+        if ($verification->ok()) {
             $user->verified = true;
             $user->save();
             $this->sendSmsNotification($client, $user);
 
             return redirect()->route('user-index');
-        }
-        else
-        {
+        } else {
             $errors = $this->getAuthyErrors($verification->errors());
-            return view('verifyUser',['errors' => new MessageBag($errors)]);
+            return view('verifyUser', ['errors' => new MessageBag($errors)]);
         }
     }
 
-    public function verifyResend(Request $request, Authenticatable $user, AuthyApi $authyApi)
+    /**
+     * This controller function handles the verification code resent
+     *
+     * @param Request $request Current User Request
+     * @param Authenticatable $user Current User
+     * @param AuthyApi $authyApi Authy Client
+     * @return mixed Response view
+     */
+    public function verifyResend(Request $request, Authenticatable $user,
+                                 AuthyApi $authyApi)
     {
         $sms = $authyApi->requestSms($user->authy_id);
 
-        if ($sms->ok())
-        {
+        if ($sms->ok()) {
             $request->session()->flash(
                 'status',
                 'Verification code re-sent'
             );
             return redirect()->route('user-show-verify');
-        }
-        else
-        {
+        } else {
             $errors = $this->getAuthyErrors($sms->errors());
-            return view('verifyUser',['errors' => new MessageBag($errors)]);
+            return view('verifyUser', ['errors' => new MessageBag($errors)]);
         }
     }
 
     private function getAuthyErrors($authyErrors)
     {
         $errors = [];
-        foreach($authyErrors as $field => $message) {
+        foreach ($authyErrors as $field => $message) {
             array_push($errors, $field . ': ' . $message);
         }
         return $errors;
@@ -118,13 +137,17 @@ class UserController extends Controller
 
     private function sendSmsNotification($client, $user)
     {
-        $twilioNumber = config('services.twilio')['number'];
+        $twilioNumber = config('services.twilio')['number'] or die(
+            "TWILIO_NUMBER is not set in the environment"
+        );
         $messageBody = 'You did it! Signup complete :)';
 
-        $client->account->messages->sendMessage(
-            $twilioNumber, // From a Twilio number in your account
-            $user->fullNumber(), // Text any number
-            $messageBody
+        $client->messages->create(
+            $user->fullNumber(),    // Phone number which receives the message
+            [
+                "from" => $twilioNumber, // From a Twilio number in your account
+                "body" => $messageBody
+            ]
         );
     }
 }
