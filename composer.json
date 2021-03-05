@@ -1,5 +1,5 @@
 {
-    "name": "TwilioDevEd/account-verification-laravel",
+    "name": "twilio-deved/account-verification-laravel",
     "description": "Authy Account Verification sample app implemented in PHP | Laravel",
     "keywords": ["authy", "twilio", "account", "verification"],
     "license": "MIT",
