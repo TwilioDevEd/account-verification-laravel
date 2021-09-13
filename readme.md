@@ -1,3 +1,10 @@
+# Important Notice
+
+For new development, we encourage you to use the Verify API instead of the Authy API. The Verify API is an evolution of the Authy API with continued support for SMS, voice, and email one-time passcodes, an improved developer experience and new features.
+
+Please visit the [Verify Quickstarts Page](https://www.twilio.com/docs/verify/quickstarts) to get started with the Verify API. Thank you!
+
+
 # Account Verification - Laravel
 [![Build Status](https://travis-ci.org/TwilioDevEd/account-verification-laravel.svg?branch=master)](https://travis-ci.org/TwilioDevEd/account-verification-laravel)
 
